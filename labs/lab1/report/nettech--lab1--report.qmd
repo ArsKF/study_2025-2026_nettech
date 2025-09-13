@@ -1,10 +1,8 @@
 ---
 ## Author
 author:
-  name: Дмитрий Сергеевич Кулябов
-  degrees: DSc
-  orcid: 0000-0002-0877-7063
-  email: kulyabov-ds@rudn.ru
+  name: Арсений Валерьевич Сергеевич Агаев
+  email: 1032221668@rudn.ru
   affiliation:
     - name: Российский университет дружбы народов
       country: Российская Федерация
@@ -13,53 +11,551 @@ author:
       address: ул. Миклухо-Маклая, д. 6
 
 ## Title
-title: "Шаблон отчёта по лабораторной работе"
-subtitle: "Простейший вариант"
+title: "Лабораторная работа №1"
+subtitle: "Методы кодирования и модуляции сигналов"
 license: "CC BY"
 ---
 
 # Цель работы
 
-Здесь приводится формулировка цели лабораторной работы.
-Формулировки цели для каждой лабораторной работы приведены в методических указаниях.
-
-Цель данного шаблона --- максимально упростить подготовку отчётов по лабораторным работам.
-Модифицируя данный шаблон, студенты смогут без труда подготовить отчёт по лабораторным работам, а также познакомиться с основными возможностями разметки Markdown.
+Изучение методов кодирования и модуляции сигналов с помощью высокоуровнего 
+языка программирования Octave. Определение спектра и параметров
+сигнала. Демонстрация принципов модуляции сигнала на примере аналоговой
+амплитудной модуляции. Исследование свойства самосинхронизации сигнала.
 
 # Задание
 
-Здесь приводится описание задания в соответствии с рекомендациями методического пособия и выданным вариантом.
+1. Построить график функций y = sin(x) + (1/3)sin(3x) + (1/5)sin(5x) и y = cos(x) + (1/3)cos(3x) + (1/5)cos(5x) на интервале [-10; 10], используя Octave и функцию plot. Графики экспортировать в файлы формата .eps, .png.
 
-# Теоретическое введение
+2. Разработать код m-файла, результатом выполнения которого являются графики меандра, реализованные с различным количеством гармоник.
 
-Здесь описываются теоретические аспекты, связанные с выполнением работы.
+3. Определить спектр двух отдельных сигналов и их суммы.
 
-Например, в [табл. @tbl-std-dir] приведено краткое описание стандартных каталогов Unix.
+4. Продемонстрировть принципы модуляции сигнала на примере аналоговой амплитудной модуляции.
 
-| Имя каталога | Описание каталога                                                                                                          |
-|--------------|----------------------------------------------------------------------------------------------------------------------------|
-| `/`          | Корневая директория, содержащая всю файловую                                                                               |
-| `/bin `      | Основные системные утилиты, необходимые как в однопользовательском режиме, так и при обычной работе всем пользователям     |
-| `/etc`       | Общесистемные конфигурационные файлы и файлы конфигурации установленных программ                                           |
-| `/home`      | Содержит домашние директории пользователей, которые, в свою очередь, содержат персональные настройки и данные пользователя |
-| `/media`     | Точки монтирования для сменных носителей                                                                                   |
-| `/root`      | Домашняя директория пользователя  `root`                                                                                   |
-| `/tmp`       | Временные файлы                                                                                                            |
-| `/usr`       | Вторичная иерархия для данных пользователя                                                                                 |
-
-: Описание некоторых каталогов файловой системы GNU Linux {#tbl-std-dir}
-
-Более подробно про Unix см. в [@tanenbaum_book_modern-os_ru; @robbins_book_bash_en; @zarrelli_book_mastering-bash_en; @newham_book_learning-bash_en].
+5. По заданных битовых последовательностей требуется получить кодированные сигналы для нескольких кодов, проверить свойства самосинхронизуемости кодов, получить спектры.
 
 # Выполнение лабораторной работы
 
-Описываются проведённые действия, в качестве иллюстрации даётся ссылка на иллюстрацию ([рис. @fig-001]).
+## Построение графиков в Octave
 
-![V Сольвеевский конгресс (1927) «Электроны и фотоны»](image/solvay.jpg){#fig-001 width=70%}
+Создаю новый файл, используя оконный интерфейс Octave, и сохраняю его с именем plot_sin.m.
+
+В созданный файл записываю следующий код:
+
+```
+x=-10:0.1:10;
+y1=sin(x)+1/3*sin(3*x)+1/5*sin(5*x);
+
+plot(x, y1, "-ok; y1=sin(x)+(1/3)*sin(3*x)+(1/5)*sin(5*x);", "markersize", 4);
+grid on;
+xlabel('x');
+ylabel('y');
+title('y1=sin(x) + (1/3)sin(3x) + (1/5)sin(5x)');
+print("plot-sin.eps", "-mono", "-FArial:16", "-deps");
+print("plot-sin.png");
+```
+
+После запускаю сценарий и получаю файлы с графиком ([рис. @fig-001]).
+
+![График функции y1=sin(x)+(1/3)*sin(3*x)+(1/5)*sin(5*x)](image/plot-sin.png){#fig-001 width=70%}
+
+Далее, отредактировал код программы и добавил второй график:
+
+```
+x=-10:0.1:10;
+y1=sin(x)+1/3*sin(3*x)+1/5*sin(5*x);
+y2=cos(x)+1/3*cos(3*x)+1/5*cos(5*x);
+
+hold on;
+plot(x, y1, "-ok; y1=sin(x)+(1/3)*sin(3*x)+(1/5)*sin(5*x);", "markersize", 4);
+plot(x, y2, "k; y2=cos(x)+(1/3)*cos(3*x)+(1/5)*cos(5*x);", "markersize", 4);
+hold off;
+
+grid on;
+xlabel('x');
+ylabel('y');
+title('y1-y2');
+print("plot-sin-cos.eps", "-mono", "-FArial:16", "-deps");
+print("plot-sin-cos.png");
+```
+
+В результате получил такой график ([рис. @fig-002])
+
+![График функций](image/plot-sin-cos.png){#fig-002 width=70%}
+
+## Разложение импульсного сигнала в частичный ряд Фурье
+
+Создал новый сценарий и сохранил его в файл meandr.m с таким содержимым:
+
+```
+N=8;
+t=-1:0.01:1;
+A=1;
+T=1;
+
+nh=(1:N)*2-1;
+Am=2/pi ./ nh;
+Am(2:2:end) = -Am(2:2:end);
+
+harmonics=cos(2 * pi * nh' * t/T);
+s1=harmonics.*repmat(Am',1,length(t));
+
+s2=cumsum(s1);
+for k=1:N
+  subplot(4,2,k);
+  plot(t, s2(k,:));
+end
+
+print("plot_meandr.png")
+```
+
+В результате выполнения получил графики для реализации меандра через косинусы ([рис. @fig-003]).
+
+![График функций меандра (косинусы)](image/plot_meandr.png){#fig-003 width=70%}
+
+Далее изменил программу для реализации через синусы:
+
+```
+N=8;
+t=-1:0.01:1;
+A=1;
+T=1;
+
+nh=(1:N)*2-1;
+Am=2/pi ./ nh;
+Am(2:2:end) = -Am(2:2:end);
+
+harmonics=sin(2 * pi * nh' * t/T);
+s1=harmonics.*repmat(Am',1,length(t));
+
+s2=cumsum(s1);
+for k=1:N
+  subplot(4,2,k);
+  plot(t, s2(k,:));
+end
+
+print("plot_meandr_sin.png")
+```
+
+И получил графики реализации меандра через синусы ([рис. @fig-004]).
+
+![График функций меандра (синусы)](image/plot_meandr_sin.png){#fig-004 width=70%}
+
+## Определение спектра и параметров сигнала
+
+Я создал новый каталог spectre1 и в нем новый сценарий spectre.m с данным содержимым:
+
+```
+mkdir 'signal';
+mkdir 'spectre';
+
+tmax = 0.5;
+fd = 512;
+f1 = 10;
+f2 = 40;
+a1 = 1;
+a2 = 0.7;
+t = 0:1./fd:tmax;
+fd2 = fd/2;
+
+signal1 = a1*sin(2*pi*t*f1);
+signal2 = a2*sin(2*pi*t*f2);
+```
+
+В том же файле построил график сигналов ([рис. @fig-005]):
+
+```
+plot(signal1, 'b');
+
+hold on;
+plot(signal2, 'r');
+hold off;
+
+title('Signal');
+
+print('signal/spectre.png');
+```
+
+![Синусоидальные сигналы разной частоты](image/spectre1/signal/spectre.png){#fig-005 width=70%}
+
+Продолжая, ищу спектры сигналов ([рис. @fig-006]):
+
+```
+spectre1 = abs(fft(signal1,fd));
+spectre2 = abs(fft(signal2,fd));
+
+plot(spectre1, 'b');
+hold on;
+plot(spectre2, 'r');
+hold off;
+
+title('Spectre');
+print('spectre/spectre.png');
+```
+
+![Спектры синусоидальных сигналов](image/spectre1/spectre/spectre.png){#fig-006 width=70%}
+
+Корректирую график, отбрасывая дублирующие отрицательные частоты и учитывая суммирование амплитуд сигналов ([рис. @fig-007]):
+
+```
+f = 1000 * (0:fd2)./(2*fd);
+
+spectre1 = 2 * spectre1/fd2;
+spectre2 = 2 * spectre2/fd2;
+
+plot(f, spectre1(1:fd2+1), 'b');
+hold on;
+plot(f, spectre2(1:fd2+1), 'r');
+hold off;
+
+xlim([0 100]);
+title('Fixed spectre');
+xlabel('Frequency (Hz)');
+print('spectre/spectre_fix.png');
+```
+
+![Исправленный график спектров синусоидальных сигналов](image/spectre1/spectre/spectre_fix.png){#fig-007 width=70%}
+
+После, для нахождения спектра суммы рассмотренных сигналов, создал новый каталог spectr_sum и новый сценарий spectre_sum.m:
+
+```
+mkdir 'signal';
+mkdir 'spectre';
+
+tmax = 0.5;
+fd = 512;
+f1 = 10;
+f2 = 40;
+a1 = 1;
+a2 = 0.7;
+t = 0:1./fd:tmax;
+fd2 = fd/2;
+
+signal1 = a1*sin(2*pi*t*f1);
+signal2 = a2*sin(2*pi*t*f2);
+signal = signal1 + signal2;
+
+plot(signal);
+title('Signal');
+print('signal/spectre_sum.png');
+
+spectre = fft(signal,fd);
+
+f = 1000 * (0:fd2)./(2*fd);
+
+spectre = 2 * sqrt(spectre.*conj(spectre))./fd2;
+
+plot(f, spectre(1:fd2+1));
+
+xlim([0 100]);
+title('Spectre');
+xlabel('Frequency (Hz)');
+print('spectre/spectre_sum.png');
+```
+
+В результате которого получил аналогичный предыдущему результат ([рис. @fig-008] и [рис. @fig-009])
+
+![Суммарный сигнал](image/spectr_sum/signal/spectre_sum.png){#fig-008 width=70%}
+
+![Спектр суммарного сигнала](image/spectr_sum/spectre/spectre_sum.png){#fig-009 width=70%}
+
+## Амплитудная модуляция
+
+Я создал новый каталог modulation и в нем новый сценарий am.m с таким содержимым:
+
+```
+mkdir 'signal';
+mkdir 'spectre';
+
+tmax = 0.5;
+fd = 512;
+f1 = 5;
+f2 = 50;
+fd2 = fd/2;
+
+t = 0:1./fd:tmax;
+signal1 = sin(2*pi*t*f1);
+signal2 = sin(2*pi*t*f2);
+signal = signal1 .* signal2;
+plot(signal, 'b');
+hold on;
+plot(signal1, 'r');
+plot(-signal1, 'r');
+hold off;
+title('Signal');
+print 'signal/am.png';
+
+spectre = fft(signal,fd);
+
+f = 1000*(0:fd2)./(2*fd);
+
+spectre = 2*sqrt(spectre.*conj(spectre))./fd2;
+
+plot(f,spectre(1:fd2+1), 'b');
+xlim([0 100]);
+title('Spectre');
+xlabel('Frequency (Hz)');
+print 'spectre/am.png';
+```
+
+Результатом которого стали данные графики ([рис. @fig-010] и [рис. @fig-011])
+
+![Сигнал и огибающая при амплитудной модуляции](image/modulation/signal/am.png){#fig-010 width=70%}
+
+![Спектр сигнала при амплитудной модуляции](image/modulation/spectre/am.png){#fig-011 width=70%}
+
+## Кодирование сигнала. Исследование свойства самосинхронизации сигнала.
+
+Перед началом работы необходимо установить пакеты control и signal:
+
+```
+pkg list -forge
+pkg install -forge control signal
+```
+
+После я создал каталог coding и сценарии далее:
+
+main.m:
+
+```
+pkg load signal;
+
+data=[0 1 0 0 1 1 0 0 0 1 1 0];
+data_sync=[0 0 0 0 0 0 0 1 1 1 1 1 1 1];
+data_spectre=[0 1 0 1 0 1 0 1 0 1 0 1 0 1];
+
+mkdir 'signal';
+mkdir 'sync';
+mkdir 'spectre';
+
+axis("auto");
+
+% Униполярное кодирование
+wave=unipolar(data);
+plot(wave);
+ylim([-1 6]);
+title('Unipolar');
+print 'signal/unipolar.png';
+% Кодирование ami
+wave=ami(data);
+plot(wave);
+title('AMI');
+print 'signal/ami.png';
+% Кодирование NRZ
+wave=bipolarnrz(data);
+plot(wave);
+title('Bipolar Non-Return to Zero');
+print 'signal/bipolarnrz.png';
+% Кодирование RZ
+wave=bipolarrz(data);
+plot(wave);
+title('Bipolar Return to Zero');
+print 'signal/bipolarrz.png';
+% Манчестерское кодирование
+wave=manchester(data);
+plot(wave);
+title('Manchester');
+print 'signal/manchester.png';
+% Дифференциальное манчестерское кодирование
+wave=diffmanc(data);
+plot(wave);
+title('Differential Manchester');
+print 'signal/diffmanc.png';
+
+% Униполярное кодирование
+wave=unipolar(data_sync);
+plot(wave);
+ylim([-1 6]);
+title('Unipolar');
+print 'sync/unipolar.png';
+% Кодирование AMI
+wave=ami(data_sync);
+plot(wave);
+title('AMI');
+print 'sync/ami.png';
+% Кодирование NRZ
+wave=bipolarnrz(data_sync);
+plot(wave);
+title('Bipolar Non-Return to Zero');
+print 'sync/bipolarnrz.png';
+% Кодирование RZ
+wave=bipolarrz(data_sync);
+plot(wave);
+title('Bipolar Return to Zero');
+print 'sync/bipolarrz.png';
+% Манчестерское кодирование
+wave=manchester(data_sync);
+plot(wave);
+title('Manchester');
+print 'sync/manchester.png';
+% Дифференциальное манчестерское кодирование
+wave=diffmanc(data_sync);
+plot(wave);
+title('Differential Manchester');
+print 'sync/diffmanc.png';
+
+% Униполярное кодирование:
+wave=unipolar(data_spectre);
+spectre=calcspectre(wave);
+title('Unipolar');
+print 'spectre/unipolar.png';
+% Кодирование AMI:
+wave=ami(data_spectre);
+spectre=calcspectre(wave);
+title('AMI');
+print 'spectre/ami.png';
+% Кодирование NRZ:
+wave=bipolarnrz(data_spectre);
+spectre=calcspectre(wave);
+title('Bipolar Non-Return to Zero');
+print 'spectre/bipolarnrz.png';
+% Кодирование RZ:
+wave=bipolarrz(data_spectre);
+spectre=calcspectre(wave);
+title('Bipolar Return to Zero');
+print 'spectre/bipolarrz.png';
+% Манчестерское кодирование:
+wave=manchester(data_spectre);
+spectre=calcspectre(wave);
+title('Manchester');
+print 'spectre/manchester.png';
+% Дифференциальное манчестерское кодирование:
+wave=diffmanc(data_spectre);
+spectre=calcspectre(wave);
+title('Differential Manchester');
+print 'spectre/diffmanc.png';
+```
+
+maptowave.m:
+
+```
+function wave=maptowave(data)
+  data=upsample(data,100);
+  wave=filter(5*ones(1,100),1,data);
+```
+
+unipolar.m:
+
+```
+function wave=unipolar(data)
+  wave=maptowave(data);
+```
+
+ami.m:
+
+```
+% Кодирование AMI:
+function wave=ami(data)
+  am=mod(1:length(data(data==1)),2);
+  am(am==0)=-1;
+  data(data==1)=am;
+  wave=maptowave(data);
+```
+
+bipolarnrz.m:
+
+```
+% Кодирование NRZ:
+function wave=bipolarnrz(data)
+  data(data==0)=-1;
+  wave=maptowave(data);
+```
+
+bipolarrz.m:
+
+```
+% Кодирование RZ:
+function wave=bipolarrz(data)
+  data(data==0)=-1;
+  data=upsample(data,2);
+  wave=maptowave(data);
+```
+
+manchester.m:
+
+```
+% Манчестерское кодирование:
+function wave=manchester(data)
+  data(data==0)=-1;
+  data=upsample(data,2);
+  data=filter([-1 1],1,data);
+  wave=maptowave(data);
+```
+
+diffmanc.m:
+
+```
+% Дифференциальное манчестерское кодирование
+function wave=diffmanc(data)
+  data=filter(1,[1 1],data);
+  data=mod(data,2);
+  wave=manchester(data);
+```
+
+calcspectre.m:
+
+```
+% Функция построения спектра сигнала:
+function spectre = calcspectre(wave)
+  % Частота дискретизации (Гц):
+  Fd = 512;
+  Fd2 = Fd/2;
+  Fd3 = Fd/2 + 1;
+  X = fft(wave,Fd);
+  spectre = X.*conj(X)/Fd;
+  f = 1000*(0:Fd2)/Fd;
+  plot(f,spectre(1:Fd3));
+  xlabel('Frequency (Hz)');
+```
+
+После я запусти главный скрипт main.m и в каталогах singal, sync и spectre были получены
+графики кодирования сигнала ([рис. @fig-012 - @fig-017]), графики, иллюстрирующие свойства самосинхронизации ([рис. @fig-018 - @fig-023]) и графики спектров сигналов ([рис. @fig-024 - @fig-029]). 
+
+![Униполярное кодирование](image/coding/signal/unipolar.png){#fig-012 width=70%}
+
+![Кодирование AMI](image/coding/signal/ami.png){#fig-013 width=70%}
+
+![Кодирование NRZ](image/coding/signal/bipolarnrz.png){#fig-014 width=70%}
+
+![Кодирование RZ](image/coding/signal/bipolarrz.png){#fig-015 width=70%}
+
+![Манчестерское кодирование](image/coding/signal/manchester.png){#fig-016 width=70%}
+
+![Дифференциальное манчестерское кодирование](image/coding/signal/diffmanc.png){#fig-017 width=70%}
+
+
+![Униполярное кодирование: нет самосинхронизации](image/coding/sync/unipolar.png){#fig-018 width=70%}
+
+![Кодирование AMI: самосинхронизация при наличии сигнала](image/coding/sync/ami.png){#fig-019 width=70%}
+
+![Кодирование NRZ: нет самосинхронизации](image/coding/sync/bipolarnrz.png){#fig-020 width=70%}
+
+![Кодирование RZ: самосинхронизация](image/coding/sync/bipolarrz.png){#fig-021 width=70%}
+
+![Манчестерское кодирование: самосинхронизация](image/coding/sync/manchester.png){#fig-022 width=70%}
+
+![Дифференциальное манчестерское кодирование: самосинхронизация](image/coding/sync/diffmanc.png){#fig-023 width=70%}
+
+
+![Униполярное кодирование: спектр сигнала](image/coding/spectre/unipolar.png){#fig-024 width=70%}
+
+![Кодирование AMI: спектр сигнала](image/coding/spectre/ami.png){#fig-025 width=70%}
+
+![Кодирование NRZ: спектр сигнала](image/coding/spectre/bipolarnrz.png){#fig-026 width=70%}
+
+![Кодирование RZ: спектр сигнала](image/coding/spectre/bipolarrz.png){#fig-027 width=70%}
+
+![Манчестерское кодирование: спектр сигнала](image/coding/spectre/manchester.png){#fig-028 width=70%}
+
+![Дифференциальное манчестерское кодирование: спектр сигнала](image/coding/spectre/diffmanc.png){#fig-029 width=70%}
 
 # Выводы
 
-Здесь кратко описываются итоги проделанной работы.
+Я изучил методы кодирования и модуляции сигналов с помощью высокоуровнего 
+языка программирования Octave. Определил спектр и параметры
+сигнала. Продемонстрировал принципы модуляции сигнала на примере аналоговой
+амплитудной модуляции. Исследовал свойства самосинхронизации сигнала.
 
 # Список литературы{.unnumbered}
 
